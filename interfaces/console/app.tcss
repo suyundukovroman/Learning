@@ -1,0 +1,23 @@
+Scene{
+    content-align: center middle;
+}
+Button {
+    width: auto;
+    margin: 1 2;
+}
+#button-container {
+    width: 100%;
+    height: auto;
+    dock: top;
+    padding: 1 5;
+}
+#lesson_container {
+    border: round white;
+    margin: 2 2;
+    padding: 1 5;
+    height: auto;
+    width: 100%;
+}
+ListItem {
+    height: auto;
+}

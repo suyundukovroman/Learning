@@ -38,22 +38,16 @@ def parse(lesson_str: str) -> Lesson:
             result[current_segment][current_section] += "Code:" + node.children[0].children + "\n"
 
     for segment in result:
+        content = [{"type": key, "text": value} for key, value in result.get(segment).items()]
         segments.append(Segment(
             title=segment,
-            theory=result.get(segment).get("theory"),
-            practice=result.get(segment).get("practice"),
-            answer=result.get(segment).get("answer"),
+            content=content
         ))
     return Lesson(title=title_str, segments=segments)
 
 def main():
     lesson = parse(lesson_str='../data/test_lesson.md')
     print(f"{lesson.title=}")
-    for segment in lesson.segments:
-        print(f"{segment.title=}")
-        print(f"{segment.theory=}")
-        print(f"{segment.practice=}")
-        print(f"{segment.answer=}")
 
 if __name__ == '__main__':
     main()
