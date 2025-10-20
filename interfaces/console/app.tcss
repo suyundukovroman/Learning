@@ -18,6 +18,10 @@ Button {
     height: auto;
     width: 100%;
 }
-ListItem {
+ListView {
     height: auto;
+    margin: 1 1;
+}
+Label {
+    padding: 1 2;
 }

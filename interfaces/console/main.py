@@ -1,11 +1,26 @@
+import glob
+from typing import cast
+
 from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Vertical, VerticalScroll, Horizontal
 from textual.screen import Screen
-from textual.widgets import Header, Static, Button
+from textual.widgets import Header, Static, Button, ListView, ListItem, Label
 
 from core import lesson, parser
 from core.lesson_manager import LessonManager, LessonState
+
+
+class LessonItem(ListItem):
+    def __init__(self, lesson_dict: dict) -> None:
+        super().__init__()
+        self.lesson_dict = lesson_dict
+
+    def compose(self) -> ComposeResult:
+        yield Label(self.lesson_dict["title"])
+
+    def get_path(self) -> str:
+        return self.lesson_dict["path"]
 
 
 class MainApp(App):
@@ -14,14 +29,27 @@ class MainApp(App):
     def compose(self) -> ComposeResult:
         with Header():
             yield Static("Learning Application")
-        with Vertical():
-            yield Button("Start Lesson", id="start_lesson_btn")
-            yield Static("PLACEHOLDER")
+        with VerticalScroll():
+            yield Static("Select a lesson:")
+            with ListView(id="lesson_files"):
+                for lesson_file in self.get_lesson_files():
+                    yield LessonItem(lesson_file)
 
-    @on(Button.Pressed, "#start_lesson_btn")
-    def start_lesson_btn(self, event: Button.Pressed):
-        cur_lesson = parser.parse(lesson_str="../../data/test_lesson.md")
+    @on(ListView.Selected, "#lesson_files")
+    def select_lesson(self, event: ListView.Selected):
+        lesson_item: LessonItem = cast(LessonItem, event.item)
+        cur_lesson = parser.parse(lesson_str=lesson_item.get_path())
         self.push_screen(LessonScreen(cur_lesson))
+
+    def get_lesson_files(self) -> list:
+        lesson_files = []
+        for file in glob.glob(
+            "../../data/*.md",
+        ):
+            lesson_files.append(
+                {"title": file.split("\\")[-1].split(".md")[0], "path": file}
+            )
+        return lesson_files
 
 
 class LessonScreen(Screen):
