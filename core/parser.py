@@ -4,7 +4,7 @@ from core.lesson import Lesson, Segment
 
 
 def parse(lesson_str: str) -> Lesson:
-    with open(lesson_str, 'r', encoding="utf-8") as file:
+    with open(lesson_str, "r", encoding="utf-8") as file:
         content = file.read()
     document = marko.parse(content)
 
@@ -25,29 +25,44 @@ def parse(lesson_str: str) -> Lesson:
             result[current_segment] = {}
             continue
 
-        if current_segment and isinstance(node, marko.block.Heading) and node.level == 3:
+        if (
+            current_segment
+            and isinstance(node, marko.block.Heading)
+            and node.level == 3
+        ):
             current_section = node.children[0].children
             result[current_segment][current_section] = ""
             continue
 
-        if current_segment and current_section and (isinstance(node, marko.block.Paragraph)):
+        if (
+            current_segment
+            and current_section
+            and (isinstance(node, marko.block.Paragraph))
+        ):
             result[current_segment][current_section] += node.children[0].children + "\n"
             continue
 
-        if current_segment and current_section and (isinstance(node, marko.block.FencedCode)):
-            result[current_segment][current_section] += "Code:" + node.children[0].children + "\n"
+        if (
+            current_segment
+            and current_section
+            and (isinstance(node, marko.block.FencedCode))
+        ):
+            result[current_segment][current_section] += (
+                "Code:" + node.children[0].children + "\n"
+            )
 
     for segment in result:
-        content = [{"type": key, "text": value} for key, value in result.get(segment).items()]
-        segments.append(Segment(
-            title=segment,
-            content=content
-        ))
+        content = [
+            {"type": key, "text": value} for key, value in result.get(segment).items()
+        ]
+        segments.append(Segment(title=segment, content=content))
     return Lesson(title=title_str, segments=segments)
 
+
 def main():
-    lesson = parse(lesson_str='../data/test_lesson.md')
+    lesson = parse(lesson_str="../data/test_lesson.md")
     print(f"{lesson.title=}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
